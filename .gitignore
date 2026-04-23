@@ -1,0 +1,18 @@
+# Build artifacts and node_modules — never commit
+node_modules/
+dist/
+_mcpb_stage/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Credentials — never commit (defense in depth)
+.env
+*.pem
+*_secret.json
+*-secret.json
+access_key*
