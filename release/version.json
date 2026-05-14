@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "downloadUrl": "https://github.com/repl-nilanjan-ghosh/sumologic-mcp-server/raw/main/release/sumologic-mcp-server.mcpb",
-  "releaseDate": "2026-04-24",
-  "releaseNotes": "v1.1.0 — Adds sumo_library (browse team's saved queries), summary mode (auto-summarizes >200 messages), expanded Replicon context (DAGs, OLAP, RabbitMQ, PSA sync), sumo_admin tool, GitHub-backed auto-update and blocklist."
+  "releaseDate": "2026-05-15",
+  "releaseNotes": "v1.2.0 — Adds shareable Sumo UI links. Pass include_share_url=true on sumo_search or sumo_investigate to get a deep link with the query and exact time range frozen at search time. Recipient opens the link in their browser and sees the same investigation context. Also adds sumo_admin actions share_last and share_history to retrieve share URLs after a search. Fully additive — existing usage is unchanged."
 }
