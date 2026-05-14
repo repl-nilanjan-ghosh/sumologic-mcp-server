@@ -9,7 +9,7 @@ Public because the `.mcpb` is downloaded directly by team members' machines (no 
 ```
 release/
   version.json           ← Checked monthly by all installed extensions
-  sumologic-mcp-server.mcpb  ← The actual bundle (4.2 MB, binary)
+  sumologic-mcp-server.mcpb  ← The actual bundle (~4.3 MB, binary)
 config/
   blocklist.json         ← Checked daily by all installed extensions
 README.md                ← This file
@@ -19,7 +19,7 @@ README.md                ← This file
 
 Every installed extension, on startup:
 
-1. Reads its hardcoded version (e.g. `1.1.0`).
+1. Reads its hardcoded version (e.g. `1.2.0`).
 2. If this is the first time starting in a new calendar month, fetches `release/version.json`. If the version there is newer, downloads the `.mcpb` to the user's Desktop.
 3. Every day, fetches `config/blocklist.json`. If the current Windows username appears in `blocked_users` (or `block_all` is true), the extension refuses to start.
 
@@ -30,28 +30,34 @@ Both checks fail-open — if GitHub is unreachable, the extension continues to w
 ## Releasing a new version
 
 1. Update `src/` in the build project (`C:\claude-tools\sumologic-mcp-server`)
-2. Bump `CURRENT_VERSION` in `src/index.ts` AND `version` in `manifest.json`. Example: `1.1.0` → `1.1.1` (patch) or `1.2.0` (minor).
+2. Bump `CURRENT_VERSION` in `src/index.ts` AND `version` in `manifest.json`. Example: `1.2.0` → `1.2.1` (patch) or `1.3.0` (minor).
 3. Build + pack:
    ```cmd
    cd C:\claude-tools\sumologic-mcp-server
-   npm run build
-   REM ...pack commands (see build notes)
+   pack.bat
    ```
+   `pack.bat` handles dependency install, TypeScript build, staging, and produces `sumologic-mcp-server.mcpb` (~4 MB). The final line prints the file size — should be 4,000,000+ bytes. If it's tiny (~30 KB), the production dependency bundling failed; check the [5/6] step output for npm install errors.
 4. Copy the resulting `.mcpb` into this repo:
    ```cmd
    copy /Y C:\claude-tools\sumologic-mcp-server\sumologic-mcp-server.mcpb C:\claude-tools\sumologic-mcp-server-repo\release\
    ```
-5. Update `release/version.json` — set new `version`, `releaseDate`, and a human-readable `releaseNotes` (1-3 sentences).
+5. Update `release/version.json` — set new `version`, `releaseDate`, and a human-readable `releaseNotes` (1-3 sentences describing what changed and any user-facing actions).
 6. Commit + push:
    ```cmd
    cd C:\claude-tools\sumologic-mcp-server-repo
    git add release/
-   git commit -m "Release v1.1.1 — <short summary>"
+   git commit -m "Release v1.2.1 — <short summary>"
    git push
    ```
-7. Within ~1 month, every team member's extension will detect the new version on startup and download it to their Desktop. They drag it into Claude Desktop Extensions → done.
+7. Verify GitHub is serving the new version:
+   ```cmd
+   curl -k https://raw.githubusercontent.com/repl-nilanjan-ghosh/sumologic-mcp-server/main/release/version.json
+   ```
+8. Within ~1 month, every team member's extension will detect the new version on startup and download it to their Desktop. They drag it into Claude Desktop Extensions → done.
 
 **Note:** Version comparison uses semver. `1.1.10 > 1.1.9 > 1.1.1 > 1.1.0`. Don't accidentally ship `1.1.01`.
+
+**Note on in-place updates:** When team members drag a new `.mcpb` over an existing install, Claude Desktop may show a transient `Manifest file not found` error. This is a Claude Desktop quirk during in-place updates, not a problem with the package. Workaround: fully quit Claude Desktop (right-click system tray → Quit; verify no `Claude.exe` in Task Manager), then reopen. Include this note in any team-wide rollout announcement.
 
 ---
 
@@ -64,7 +70,7 @@ Edit `config/blocklist.json`:
   "blocked_users": ["jane.doe"],
   "block_all": false,
   "message": "Your access is paused pending resolution of <issue>. Contact Nilanjan.",
-  "updated_at": "2026-04-24"
+  "updated_at": "2026-05-15"
 }
 ```
 
